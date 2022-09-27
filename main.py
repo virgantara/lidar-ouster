@@ -10,11 +10,11 @@ hostname = 'os-122215001365.local'
 lidar_port = 7502
 imu_port = 7503
 
-def startLidar(hostname):
+def startLidar(hostname,lidar_port, imu_port):
     config = client.SensorConfig()
     config.lidar_mode = client.LidarMode.MODE_1024x10
-    config.udp_port_lidar = 7502
-    config.udp_port_imu = 7503
+    config.udp_port_lidar = lidar_port
+    config.udp_port_imu = imu_port
     config.operating_mode = client.OperatingMode.OPERATING_NORMAL
     client.set_config(hostname, config, persist=True, udp_dest_auto=True)
 
@@ -70,7 +70,7 @@ def streamLidar(hostname, lidar_port):
                     break
     cv2.destroyAllWindows()
 
-# startLidar(hostname)
+# startLidar(hostname, lidar_port, imu_port)
 streamLidar(hostname, lidar_port)
 # stopLidar(hostname)
 # recordLidar(hostname, lidar_port, imu_port)
