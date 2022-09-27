@@ -18,7 +18,7 @@ def startLidar(hostname):
     config.operating_mode = client.OperatingMode.OPERATING_NORMAL
     client.set_config(hostname, config, persist=True, udp_dest_auto=True)
 
-def setStanbyLidar(hostname):
+def stopLidar(hostname):
     config = client.SensorConfig()
     config.operating_mode = client.OperatingMode.OPERATING_STANDBY
     client.set_config(hostname, config, persist=True, udp_dest_auto=True)
@@ -70,7 +70,7 @@ def streamLidar(hostname, lidar_port):
                     break
     cv2.destroyAllWindows()
 
-startLidar(hostname)
+# startLidar(hostname)
 streamLidar(hostname, lidar_port)
-setStanbyLidar(hostname)
+# stopLidar(hostname)
 # recordLidar(hostname, lidar_port, imu_port)
