@@ -1,6 +1,6 @@
 from ouster import client
 from ouster import pcap
-
+from LIDAR import get_xyz_from_pcap
 import numpy as np
 import matplotlib.pyplot as plt
 hostname = 'os-122215001365.local'
@@ -23,23 +23,18 @@ scans = iter(client.Scans(source))
 scan = next(scans,1)
 
 # set up figure
-plt.figure()
+
+
+plt.title("3D Points from {}".format(hostname))
+
+# graph xyz
+x, y, z = get_xyz_from_pcap(pcap_path, meta_path)
+# plt.figure()
 ax = plt.axes(projection='3d')
 r = 3
 ax.set_xlim3d([-r, r])
 ax.set_ylim3d([-r, r])
 ax.set_zlim3d([-r, r])
-
-plt.title("3D Points from {}".format(hostname))
-
-# [doc-stag-plot-xyz-points]
-# transform data to 3d points
-xyzlut = client.XYZLut(metadata)
-xyz = xyzlut(scan.field(client.ChanField.RANGE))
-# [doc-etag-plot-xyz-points]
-
-# graph xyz
-[x, y, z] = [c.flatten() for c in np.dsplit(xyz, 3)]
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
