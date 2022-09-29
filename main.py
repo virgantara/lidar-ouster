@@ -31,7 +31,6 @@ metadata = source.metadata
 print(info)
 xyzlut = client.XYZLut(metadata)
 # create an iterator of LidarScans from pcap and bound it if num is specified
-
 scans = iter(client.Scans(source))
 # if num:
 #     scans = islice(scans, num)
@@ -57,8 +56,9 @@ for idx, scan in enumerate(scans):
 
     # not necessary, but output points in "image" vs. staggered order
     frame = client.destagger(metadata, frame)
+    # print(xyz)
     print(xyz.shape)
-    print(frame.shape)
+    # print(np.array(fields_values).shape)
     # write csv out to file
 
     # csv_path = os.path.join(csv_dir, f'{csv_base}_{idx:06d}.{csv_ext}')
