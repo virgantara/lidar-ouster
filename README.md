@@ -1,3 +1,12 @@
+### Device Information
+- Model: OS-1-32-U2
+- Channel: 32
+- Horizontal resolution: 512, 1024 (default), 2048
+- Range: 120 m
+- Vertical FOV: 45° (±22.5º)
+- Points per second: 655.360
+- Precision: ±0.7 – 5 cm
+
 ### Requirements
 - Python >= 3.7 and pip >= 19.0
 - Linux distribution x86_64 and ARM64 platforms
