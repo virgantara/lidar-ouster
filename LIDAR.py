@@ -1,10 +1,12 @@
 from ouster import client
+from ouster.sdk import viz
 from ouster import pcap
 from contextlib import closing
 from more_itertools import time_limited
 from datetime import datetime
 import cv2
 import numpy as np
+from more_itertools import nth
 
 hostname = 'os-122215001365.local'
 lidar_port = 7502
@@ -102,3 +104,31 @@ def stream_range_and_reflectivity(hostname, lidar_port):
         cv2.destroyAllWindows()
     except Exception as e:
         print("Error:",e)
+
+def display_recorded(pcap_path, meta_path):
+    with open(meta_path, 'r') as f:
+        info = client.SensorInfo(f.read())
+
+
+    source = pcap.Pcap(pcap_path, info)
+    meta = source.metadata
+    scans = client.Scans(source)
+    # iterate `scans` and get the 84th LidarScan (it can be different with your data)
+    # Creating a point viz instance
+
+    point_viz = viz.PointViz("Example Viz")
+    viz.add_default_controls(point_viz)
+
+    # ... add objects here
+    scan = nth(scans, 0)
+    signal = scan.field(client.ChanField.REFLECTIVITY)
+
+    signal = client.destagger(meta, signal)
+
+    signal = np.divide(signal, np.amax(signal), dtype=np.float32)
+    cloud_scan = viz.Cloud(meta)
+    cloud_scan.set_range(scan.field(client.ChanField.RANGE))
+    cloud_scan.set_key(signal)
+    point_viz.add(cloud_scan)
+    point_viz.update()
+    point_viz.run()
