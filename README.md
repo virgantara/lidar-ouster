@@ -22,3 +22,6 @@ Di project ini ada satu file main.py yang isinya beberapa fungsi berikut:
 - [Quickstart](https://static.ouster.dev/sdk-docs/python/quickstart.html)
 - [PointViz Tutorial](https://static.ouster.dev/sdk-docs/python/viz/viz-api-tutorial.html#structured-point-cloud)
 - [LidarScan API](https://static.ouster.dev/sdk-docs/reference/lidar-scan.html)
+
+### Misc
+- [PointViz Threading for Real-time visualization](https://github.com/ouster-lidar/ouster_example/blob/master/python/src/ouster/sdk/viz.py)
