@@ -18,29 +18,31 @@ with open(meta_path, 'r') as f:
 source = pcap.Pcap(pcap_path, info)
 metadata = source.metadata
 scans = iter(client.Scans(source))
-# get single scan
-# metadata, scans = client.Scans.sample(hostname, 1, lidar_port)
+
 # scan = next(scans)[0]
-
 scan = next(scans,1)
-
-# set up figure
-
-plt.title("3D Points from {}".format(hostname))
 
 # graph xyz
 x, y, z = get_xyz_from_pcap(pcap_path, meta_path)
 
-display_plot = True
+r = np.sqrt(x**2 + y**2)
+rad_alpha = np.arctan2(x, y)
+deg_alpha = np.degrees(rad_alpha)
+depth = r * 255 / np.max(r)
 
-if display_plot:
-    ax = plt.axes(projection='3d')
-    r = 3
-    ax.set_xlim3d([-r, r])
-    ax.set_ylim3d([-r, r])
-    ax.set_zlim3d([-r, r])
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    ax.scatter(x, y, z, c=z / max(z), s=0.2)
-    plt.show()
+min_z, max_z = np.min(z), np.max(z)
+h_res = 1024
+v_res = 32
+img_x = np.floor(h_res * x / np.max(x)).astype(int)
+img_y = np.floor(v_res * y / np.max(y)).astype(int)
+
+img = np.zeros((np.max(img_x), np.max(img_y)))
+
+img[:,:] = r.reshape(1024,32)
+img = img.reshape(32,1024)
+img = cv2.resize(img, (h_res, v_res * 5))
+
+plt.title("Front View")
+plt.imshow(img)
+plt.show()
+
