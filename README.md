@@ -1,4 +1,5 @@
 ### Device Information
+- Merek: OUSTER 
 - Model: OS-1-32-U2
 - Channel: 32
 - Horizontal resolution: 512, 1024 (default), 2048
