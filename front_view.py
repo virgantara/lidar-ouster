@@ -38,7 +38,7 @@ img_y = np.floor(v_res * z / np.max(z)).astype(int)
 
 img = np.zeros((np.max(img_x), np.max(img_y)))
 
-img[:,:] = depth.reshape(1024,32)
+img = depth.reshape(1024,32)
 img = img.reshape(32,1024)
 img = cv2.resize(img, (h_res, v_res * 5))
 
