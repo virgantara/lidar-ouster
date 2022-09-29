@@ -30,15 +30,15 @@ rad_alpha = np.arctan2(x, y)
 deg_alpha = np.degrees(rad_alpha)
 depth = r * 255 / np.max(r)
 
-min_z, max_z = np.min(z), np.max(z)
 h_res = 1024
 v_res = 32
-img_x = np.floor(h_res * x / np.max(x)).astype(int)
-img_y = np.floor(v_res * y / np.max(y)).astype(int)
+
+img_x = np.floor(h_res * deg_alpha / np.max(deg_alpha)).astype(int)
+img_y = np.floor(v_res * z / np.max(z)).astype(int)
 
 img = np.zeros((np.max(img_x), np.max(img_y)))
 
-img[:,:] = r.reshape(1024,32)
+img[:,:] = depth.reshape(1024,32)
 img = img.reshape(32,1024)
 img = cv2.resize(img, (h_res, v_res * 5))
 
