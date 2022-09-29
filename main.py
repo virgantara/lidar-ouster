@@ -14,33 +14,34 @@ hostname = 'os-122215001365.local'
 lidar_port = 7502
 imu_port = 7503
 
-with open("os-122215001365.local.json",'r') as f:
-    info = client.SensorInfo(f.read())
+def display_recorded(pcap_path, meta_path):
+    with open(meta_path, 'r') as f:
+        info = client.SensorInfo(f.read())
 
-print(info.format)
+    print(info.format)
 
-source = pcap.Pcap("OS-1-32-U2_122215001365_1024x10_20220928_154956.pcap", info)
-meta = source.metadata
-scans = client.Scans(source)
-# iterate `scans` and get the 84th LidarScan (it can be different with your data)
-# Creating a point viz instance
+    source = pcap.Pcap(pcap_path, info)
+    meta = source.metadata
+    scans = client.Scans(source)
+    # iterate `scans` and get the 84th LidarScan (it can be different with your data)
+    # Creating a point viz instance
 
-point_viz = viz.PointViz("Example Viz")
-viz.add_default_controls(point_viz)
+    point_viz = viz.PointViz("Example Viz")
+    viz.add_default_controls(point_viz)
 
-# ... add objects here
-scan = nth(scans, 1)
-signal = scan.field(client.ChanField.REFLECTIVITY)
+    # ... add objects here
+    scan = nth(scans, 0)
+    signal = scan.field(client.ChanField.REFLECTIVITY)
 
-signal = client.destagger(meta, signal)
+    signal = client.destagger(meta, signal)
 
-signal = np.divide(signal, np.amax(signal), dtype=np.float32)
-cloud_scan = viz.Cloud(meta)
-cloud_scan.set_range(scan.field(client.ChanField.RANGE))
-cloud_scan.set_key(signal)
-point_viz.add(cloud_scan)
-point_viz.update()
-point_viz.run()
+    signal = np.divide(signal, np.amax(signal), dtype=np.float32)
+    cloud_scan = viz.Cloud(meta)
+    cloud_scan.set_range(scan.field(client.ChanField.RANGE))
+    cloud_scan.set_key(signal)
+    point_viz.add(cloud_scan)
+    point_viz.update()
+    point_viz.run()
 
 # ranges = scan.field(client.ChanField.RANGE)
 # destagger ranges, notice `metadata` use, that is needed to get
@@ -128,4 +129,4 @@ point_viz.run()
 # startLidar(hostname, lidar_port, imu_port)
 # streamLidar(hostname, lidar_port)
 # stopLidar(hostname)
-# recordLidar(hostname, lidar_port, imu_port)
+# recordLidar(hostname, lidar_port, imu_port, 20)

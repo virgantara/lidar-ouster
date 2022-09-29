@@ -48,8 +48,8 @@ def recordLidar(hostname, lidar_port, imu_port, record_duration=1):
         meta = source.metadata
         fname_base = f"{meta.prod_line}_{meta.sn}_{meta.mode}_{time_part}"
         #
-        # print(f"Saving sensor metadata to: {fname_base}.json")
-        # source.write_metadata(f"{fname_base}.json")
+        print(f"Saving sensor metadata to: {fname_base}.json")
+        source.write_metadata(f"{fname_base}.json")
 
         print(f"Writing to: {fname_base}.pcap (Ctrl-C to stop early)")
         source_it = time_limited(record_duration, source)
