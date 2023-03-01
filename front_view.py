@@ -10,21 +10,15 @@ hostname = 'os-122215001365.local'
 lidar_port = 7502
 imu_port = 7503
 
-meta_path = "OS-1-32-U2_122215001365_1024x10_20220929_100745.json"
-pcap_path = "OS-1-32-U2_122215001365_1024x10_20220929_100745.pcap"
-# precompute xyzlut to save computation in a loop
-with open(meta_path, 'r') as f:
-    info = client.SensorInfo(f.read())
-
-source = pcap.Pcap(pcap_path, info)
-metadata = source.metadata
-scans = iter(client.Scans(source))
-
-# scan = next(scans)[0]
-scan = next(scans,1)
+meta_path = "berdiri_kanan/OS-1-32-U2_122215001365_1024x10_20221026_162913.json"
+pcap_path = "berdiri_kanan/OS-1-32-U2_122215001365_1024x10_20221026_162913.pcap"
 
 # graph xyz
-x, y, z = get_xyz_from_pcap(pcap_path, meta_path)
+x, y, z = get_xyz_from_pcap(
+    frame_num=0,
+    pcap_path=pcap_path,
+    meta_path=meta_path
+)
 
 r = np.sqrt(x**2 + y**2)
 rad_alpha = np.arctan2(x, y)

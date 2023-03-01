@@ -29,7 +29,7 @@ scan = next(scans,1)
 plt.title("3D Points from {}".format(hostname))
 
 # graph xyz
-x, y, z = get_xyz_from_pcap(pcap_path, meta_path)
+x, y, z = get_xyz_from_pcap(frame_num=0,pcap_path=pcap_path, meta_path=meta_path)
 
 display_plot = True
 

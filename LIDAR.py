@@ -27,9 +27,10 @@ def read_sensor_status(hostname):
             source.write_metadata(f"{hostname}.json")
     except Exception as e:
         print("Error:",e)
-def startLidar(hostname,lidar_port, imu_port):
+def startLidar(hostname,lidar_port, imu_port, azimuth_start=0, azimuth_end=360000):
     config = client.SensorConfig()
-    config.lidar_mode = client.LidarMode.MODE_1024x10
+    config.lidar_mode = client.LidarMode.MODE_2048x10
+    config.azimuth_window = (azimuth_start, azimuth_end)
     config.udp_port_lidar = lidar_port
     config.udp_port_imu = imu_port
     config.operating_mode = client.OperatingMode.OPERATING_NORMAL
@@ -41,22 +42,24 @@ def stopLidar(hostname):
     client.set_config(hostname, config, persist=True, udp_dest_auto=True)
 
 
-def recordLidar(hostname, lidar_port, imu_port, record_duration=1):
+def recordLidar(dir, hostname, lidar_port, imu_port, record_duration=1):
 
     with closing(client.Sensor(hostname, lidar_port, imu_port, buf_size=640)) as source:
 
         time_part = datetime.now().strftime("%Y%m%d_%H%M%S")
-
+        print("Start Recording")
         meta = source.metadata
         fname_base = f"{meta.prod_line}_{meta.sn}_{meta.mode}_{time_part}"
         #
         print(f"Saving sensor metadata to: {fname_base}.json")
-        source.write_metadata(f"{fname_base}.json")
+
+        fpath = dir+'/'+fname_base
+        source.write_metadata(f"{fpath}.json")
 
         print(f"Writing to: {fname_base}.pcap (Ctrl-C to stop early)")
         source_it = time_limited(record_duration, source)
 
-        n_packets = pcap.record(source_it, f"{fname_base}.pcap")
+        n_packets = pcap.record(source_it, f"{fpath}.pcap")
         print(f"Captured {n_packets} packets")
 
 def streamLidar(hostname, lidar_port):
@@ -126,6 +129,13 @@ def display_recorded(pcap_path, meta_path):
     signal = client.destagger(meta, signal)
 
     signal = np.divide(signal, np.amax(signal), dtype=np.float32)
+
+    rng = client.destagger(meta, scan.field(client.ChanField.RANGE))
+    rng = (rng / np.max(rng) * 255).astype(np.uint8)
+    # rng = cv2.resize(rng, (1800, 250))
+
+    cv2.imwrite("rng.jpg", rng)
+
     cloud_scan = viz.Cloud(meta)
     cloud_scan.set_range(scan.field(client.ChanField.RANGE))
     cloud_scan.set_key(signal)
@@ -133,7 +143,28 @@ def display_recorded(pcap_path, meta_path):
     point_viz.update()
     point_viz.run()
 
-def get_xyz_from_pcap(pcap_path, meta_path):
+
+def get_range(pcap_path, meta_path):
+    with open(meta_path, 'r') as f:
+        info = client.SensorInfo(f.read())
+
+    source = pcap.Pcap(pcap_path, info)
+    meta = source.metadata
+    scans = client.Scans(source)
+    # iterate `scans` and get the 84th LidarScan (it can be different with your data)
+
+    print(scans)
+    scan = nth(scans, 0)
+
+
+    rng = client.destagger(meta, scan.field(client.ChanField.RANGE))
+    rng = (rng / np.max(rng) * 255).astype(np.uint8)
+    # rng = cv2.resize(rng, (1800, 250))
+
+    cv2.imwrite("rng.jpg", rng)
+
+    return rng
+def get_xyz_from_pcap(frame_num=0, pcap_path='', meta_path=''):
     with open(meta_path, 'r') as f:
         info = client.SensorInfo(f.read())
 
@@ -144,7 +175,7 @@ def get_xyz_from_pcap(pcap_path, meta_path):
     # metadata, scans = client.Scans.sample(hostname, 1, lidar_port)
     # scan = next(scans)[0]
 
-    scan = next(scans, 0)
+    scan = next(scans, frame_num)
 
     # [doc-stag-plot-xyz-points]
     # transform data to 3d points
