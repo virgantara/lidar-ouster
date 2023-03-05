@@ -4,7 +4,7 @@ import os
 import argparse
 from contextlib import closing
 from typing import Tuple, List
-
+import open3d as o3d
 import numpy as np
 
 from ouster import client, pcap
@@ -12,6 +12,26 @@ from ouster import client, pcap
 def normalize(x):
     return (x - np.min(x)) / (np.max(x) - np.min(x))
 
+def draw_bounding_box(bbox_min, bbox_max):
+    points = [
+        bbox_min,
+        [bbox_max[0], bbox_min[1], bbox_min[2]],
+        [bbox_min[0], bbox_max[1], bbox_min[2]],
+        [bbox_max[0], bbox_max[1], bbox_min[2]],
+        [bbox_min[0], bbox_min[1], bbox_max[2]],
+        [bbox_max[0], bbox_min[1], bbox_max[2]],
+        [bbox_min[0], bbox_max[1], bbox_max[2]],
+        bbox_max
+    ]
+    lines = [[0, 1], [0, 2], [1, 3], [2, 3], [4, 5], [4, 6], [5, 7], [6, 7],
+             [0, 4], [1, 5], [2, 6], [3, 7]]
+    colors = [[1, 0, 0] for i in range(len(lines))]
+    line_set = o3d.geometry.LineSet()
+    line_set.points = o3d.utility.Vector3dVector(points)
+    line_set.lines = o3d.utility.Vector2iVector(lines)
+    line_set.colors = o3d.utility.Vector3dVector(colors)
+    bbox = line_set
+    return bbox
 def pcap_to_pcd(source: client.PacketSource,
                 metadata: client.SensorInfo,
                 num: int = 0,
