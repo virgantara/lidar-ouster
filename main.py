@@ -10,6 +10,7 @@ import numpy as np
 from LIDAR import startLidar, stopLidar, recordLidar, streamLidar, stream_range_and_reflectivity
 from more_itertools import nth
 import time
+from helper import *
 
 hostname = 'os-122215001365.local'
 lidar_port = 7502
@@ -69,14 +70,25 @@ def showPoints():
 # print("Total",counter)
 # startLidar(hostname, lidar_port, imu_port,azimuth_start=90000, azimuth_end=270000)
 # streamLidar(hostname, lidar_port)
-stopLidar(hostname)
+# stopLidar(hostname)
 #
-# dataset_type = "45Deg"
+# dataset_type = "HumanMovement"
 # if not os.path.exists("20230301/45Deg/"+dataset_type):
 #     os.mkdir("20230301/45Deg/"+dataset_type)
 #
-# label = 'CrawlingSide'
+# label = 'WalkingCrouchSideLeft'
 # if not os.path.exists("20230301/45Deg/"+dataset_type+"/"+label):
 #     os.mkdir("20230301/45Deg/"+dataset_type+"/"+label)
 #
-# recordLidar('20230301/45Deg/'+dataset_type+'/'+label,hostname, lidar_port, imu_port, 20)
+# recordLidar('20230301/45Deg/'+dataset_type+'/'+label,hostname, lidar_port, imu_port, 15)
+
+meta_path = "20230301/45Deg/Pose/berdiri/OS-1-32-U2_122215001365_2048x10_20230301_135236.json"
+pcap_path = "20230301/45Deg/Pose/berdiri/OS-1-32-U2_122215001365_2048x10_20230301_135236.pcap"
+with open(meta_path, 'r') as f:
+    info = client.SensorInfo(f.read())
+
+
+source = pcap.Pcap(pcap_path, info)
+meta = source.metadata
+scans = client.Scans(source)
+pcap_to_pcd(source=source,metadata=meta, pcd_base="20230301/PCD/berdiri/obj")
