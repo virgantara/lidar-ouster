@@ -1,53 +1,43 @@
-import numpy as np
-import copy
-import open3d as o3d
 from helper import *
+from pathlib import Path
 
-pcd = o3d.io.read_point_cloud("20230301/PCD/45Deg/berdiri/obj_000000.pcd")
-# vis = o3d.visualization.VisualizerWithEditing(-1, False, "")
-vis = o3d.visualization.Visualizer()
-vis.create_window()
-vis.add_geometry(pcd)
-bbox_min = np.array([2,-0.7,-1])
-bbox_max = np.array([4,1,1])
+for folder in sorted(Path('20230301/PCD/45Deg').iterdir()):
+    folder_name = Path(folder).stem
+    for subfolder in sorted(Path(folder).iterdir()):
+        tmp = Path(subfolder).stem
+        if not os.path.exists("20230301/PCD_Cropped/"):
+            os.makedirs("20230301/PCD_Cropped/")
+
+        if not os.path.exists("20230301/PCD_Cropped/45Deg/"):
+            os.makedirs("20230301/PCD_Cropped/45Deg/")
+
+        if not os.path.exists("20230301/PCD_Cropped/45Deg/"+folder_name):
+            os.makedirs("20230301/PCD_Cropped/45Deg/"+folder_name)
 
 
-from math import cos, sin, sqrt
+        pcd = o3d.io.read_point_cloud("20230301/PCD/45Deg/"+folder_name+"/"+tmp+".pcd")
 
-theta = 90
+        bbox_min = np.array([2, -1.6, -1])
+        bbox_max = np.array([4, 1.8, 1])
 
-Rx = np.array([
-    [1, 0, 0],
-    [0, cos(theta), -sin(theta)],
-    [0, sin(theta), cos(theta)],
-])
+        # bbox_min = np.array([2,-0.7,-1])
+        # bbox_max = np.array([4,1,1])
 
-Ry = np.array([
-    [cos(theta), 0, sin(theta)],
-    [0, 1, 0],
-    [-sin(theta), 0, cos(theta)],
-])
+        bbox = o3d.geometry.AxisAlignedBoundingBox()
+        bbox.color = np.array([1,0,0])
+        bbox.min_bound = bbox_min
+        bbox.max_bound = bbox_max
 
-Rz = np.array([
-    [cos(theta), -sin(theta), 0],
-    [sin(theta), cos(theta), 0],
-    [0, 0, 1],
-])
-
-# R = Rx * Ry * Rz
-# bbox_min = bbox_min.reshape(-1,1)
-# bbox_max = bbox_max.reshape(-1,1)
-#
-# pt_min = np.dot(Rx,bbox_min)
-# pt_max = np.dot(Rx,bbox_max)
-# print(bbox_max)
-# print(pt_max)
-bbox = draw_bounding_box(bbox_min, bbox_max)
-vis.add_geometry(bbox)
-opt = vis.get_render_option()
-opt.show_coordinate_frame = True
-opt.background_color = np.asarray([0.5, 0.5, 0.5])
-vis.run()
-vis.destroy_window()
+        crop_pcd = pcd.crop(bbox)
+        file_output_path = "20230301/PCD_Cropped/45Deg/"+str(folder_name)+"/cropped_"+tmp+".pcd"
+        print("Writing " + folder_name + " PCD to " + file_output_path)
+        o3d.io.write_point_cloud(file_output_path, crop_pcd)
+        # exit(0)
+# vis.add_geometry(crop_pcd)
+# opt = vis.get_render_option()
+# opt.show_coordinate_frame = True
+# opt.background_color = np.asarray([0.5, 0.5, 0.5])
+# vis.run()
+# vis.destroy_window()
 # cropped_geometry= vis.get_cropped_geometry()
 # o3d.io.write_point_cloud("20230301/PCD/45Deg/berdiri/cropped_000000.pcd", cropped_geometry)
