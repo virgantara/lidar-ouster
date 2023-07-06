@@ -1,5 +1,7 @@
 import ouster.sdk.viz
 import os
+
+import pandas as pd
 from ouster.sdk import viz
 from ouster import client
 from ouster import pcap
@@ -13,6 +15,7 @@ import time
 from helper import *
 import glob
 from pathlib import Path
+import seaborn as sns
 
 hostname = 'os-122215001365.local'
 lidar_port = 7502
@@ -84,3 +87,25 @@ def showPoints():
 #     os.mkdir("20230301/45Deg/"+dataset_type+"/"+label)
 #
 # recordLidar('20230301/45Deg/'+dataset_type+'/'+label,hostname, lidar_port, imu_port, 15)
+data = {'Crouching': 390, 'Hands Up': 390, 'Lying Down': 590,
+        'Sitting': 390, 'Squatting' : 389,'Standing':89}
+y = np.array([390, 390, 590, 390, 389, 89])
+x = np.array(['Crouching','Hands Up','Lying Down','Sitting','Squatting','Standing'])
+# courses = list(data.keys())
+# values = list(data.values())
+# df = pd.DataFrame(data)
+sns.set(font_scale=2.7)
+sns.barplot(x=x,y=y)
+plt.show()
+# fig = plt.figure(figsize=(10, 7))
+#
+# # creating the bar plot
+# plt.bar(courses, values, color='maroon',
+#         width=0.4)
+# axis_font = {'fontname':'Arial', 'size':'18'}
+# # plt.rcParams.update({'font.size': 30})
+# plt.xlabel("Pose", **axis_font)
+# plt.ylabel("No. of PC ", **axis_font)
+# # plt.legend(loc=2, prop={'size': 20})
+# # plt.title("Students enrolled in different courses")
+# plt.show()
