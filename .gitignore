@@ -1,5 +1,12 @@
-*.json
-*.pcap
-.idea/**
-*.pcd
-*.ply
+# IDE Files
+#-------------------------
+/nbproject/
+.idea/*
+
+## Sublime Text cache files
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
+
